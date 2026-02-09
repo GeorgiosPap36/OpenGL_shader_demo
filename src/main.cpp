@@ -6,10 +6,9 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-#include "../dependencies/stb_image/stb_image.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "scene/demo_scene.cpp"
 
 
 // settings
@@ -30,10 +29,12 @@ double deltaTime = 0;
 unsigned int frames = 0;
 unsigned int updates = 0;
 
+DemoScene scene;
+
 // functions
 int glfwInitialization();
 void update();
-void render();
+void render(float interpolation);
 void displayFPSUPS(double &displayTimer);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
@@ -45,9 +46,6 @@ int main() {
     if (glfwInitialization() == -1) {
         return -1;
     }
-
-    // create camera
-    // create scene
 
     double displayTimer = 0;
     double lastCounter = glfwGetTime();
@@ -65,7 +63,7 @@ int main() {
             lag -= SEC_PER_UPDATE;
         }
         
-        render();
+        render(lag / SEC_PER_UPDATE);
 
         displayFPSUPS(displayTimer);
 
@@ -119,16 +117,16 @@ int glfwInitialization() {
 void update() {
     updates++;
 
-    // scene update
+    scene.update(deltaTime, keyboard, mouseMovement);
 }
 
-void render() {
+void render(float interpolation) {
     frames++;
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // scene render
+    scene.render(interpolation);
 
     glfwSwapBuffers(window);
 }

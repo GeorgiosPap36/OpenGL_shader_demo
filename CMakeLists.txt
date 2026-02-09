@@ -12,6 +12,16 @@ find_package(glm CONFIG REQUIRED)
 
 set(SOURCES
     src/main.cpp
+    src/model/mesh.cpp
+    src/model/model.cpp
+    src/shaders/shader.cpp
+    src/shaders/compute_shader.cpp
+    src/camera/camera.cpp
+    src/scene/scene.cpp
+
+    src/camera/basic_camera_controller.cpp
+    src/scene/demo_scene.cpp
+
     dependencies/glad/glad.c)
 
 add_executable(OpenGL_shader_demo ${SOURCES})
