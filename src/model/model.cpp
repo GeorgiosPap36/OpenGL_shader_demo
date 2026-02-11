@@ -1,7 +1,9 @@
 #include "model.h"
 
-Model::Model(char *path) {
+Model::Model(char const* path) {
     loadModel(path);
+
+    std::cout << "Loaded " << texturesLoaded.size() << " textures, " << meshes.size() << " meshes from directory: " << directory << std::endl;
 }
 
 void Model::draw(Shader &shader) {
@@ -18,8 +20,8 @@ void Model::loadModel(const std::string &path) {
         std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
         return;
     }
-    directory = path.substr(0, path.find_last_of('/'));
 
+    directory = std::filesystem::path(path).parent_path().string();
     processNode(scene->mRootNode, scene);
 }
 
@@ -39,8 +41,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
 
-    for(unsigned int i = 0; i < mesh->mNumVertices; i++)
-    {
+    for(unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
         glm::vec3 vector;
         // positions
@@ -79,7 +80,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
         vertices.push_back(vertex);
     }
-    
+
     for(unsigned int i = 0; i < mesh->mNumFaces; i++) {
         aiFace face = mesh->mFaces[i];
         
@@ -109,14 +110,12 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
 
     std::vector<Texture> textures;
-    for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-    {
+    for(unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
         
         bool skip = false;
-        for(unsigned int j = 0; j < texturesLoaded.size(); j++)
-        {
+        for(unsigned int j = 0; j < texturesLoaded.size(); j++) {
             if(std::strcmp(texturesLoaded[j].path.data(), str.C_Str()) == 0)
             {
                 textures.push_back(texturesLoaded[j]);
@@ -138,14 +137,17 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 }
 
 unsigned int textureFromFile(const char *path, const std::string &directory) {
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
+    std::filesystem::path fullPath = std::filesystem::path(directory) / path;
+    std::string filename = fullPath.string();
+
+    // std::cout << "Loading texture: " << filename << std::endl;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+
     if (data) {
         GLenum format;
         if (nrComponents == 1) {

@@ -29,23 +29,22 @@ double deltaTime = 0;
 unsigned int frames = 0;
 unsigned int updates = 0;
 
-DemoScene scene;
-
 // functions
 int glfwInitialization();
-void update();
-void render(float interpolation);
+void update(Scene& scene);
+void render(Scene& scene, float interpolation);
 void displayFPSUPS(double &displayTimer);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-
 
 int main() {
 
     if (glfwInitialization() == -1) {
         return -1;
     }
+
+    DemoScene scene;
 
     double displayTimer = 0;
     double lastCounter = glfwGetTime();
@@ -59,11 +58,11 @@ int main() {
         lag += deltaTime;
 
         while (lag >= SEC_PER_UPDATE) {
-            update();
+            update(scene);
             lag -= SEC_PER_UPDATE;
         }
         
-        render(lag / SEC_PER_UPDATE);
+        render(scene, lag / SEC_PER_UPDATE);
 
         displayFPSUPS(displayTimer);
 
@@ -114,13 +113,13 @@ int glfwInitialization() {
     return 0;
 }
 
-void update() {
+void update(Scene& scene) {
     updates++;
 
     scene.update(deltaTime, keyboard, mouseMovement);
 }
 
-void render(float interpolation) {
+void render(Scene& scene, float interpolation) {
     frames++;
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

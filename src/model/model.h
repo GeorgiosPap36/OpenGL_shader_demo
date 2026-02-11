@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <filesystem>
 
 #include "../../dependencies/glad/glad.h"
 
@@ -35,7 +36,7 @@ class Model
     std::vector<Mesh> meshes;
     std::string directory;
 
-    Model(char *path);
+    Model(char const* path);
     void draw(Shader &shader);
 
     private:

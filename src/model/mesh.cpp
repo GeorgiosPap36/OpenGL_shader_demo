@@ -6,6 +6,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
     this->textures = textures;
 
     setupMesh();
+
+    // std::cout << "Created mesh with " << vertices.size() << " vertices, " << indices.size() << " indices and " << textures.size() << std::endl;
 }
 
 void Mesh::draw(Shader &shader)  {
@@ -13,8 +15,7 @@ void Mesh::draw(Shader &shader)  {
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
-    for(unsigned int i = 0; i < textures.size(); i++)
-    {
+    for(unsigned int i = 0; i < textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
 
         std::string number;
