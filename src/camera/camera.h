@@ -13,7 +13,7 @@
 
 class Camera {
     public:
-    glm::vec3 up, forward, position;
+    glm::vec3 up, forward, right, position;
     float pitch, yaw, fovY;
 
     virtual ~Camera() = default;
@@ -23,7 +23,6 @@ class Camera {
     Camera(glm::vec3 up, glm::vec3 forward, glm::vec3 position, float pitch, float yaw, float fovY);
 
     glm::mat4 viewMatrix();
-    glm::vec3 right();
 
     virtual void update(float dt, std::map<int, bool>& keyboard, glm::vec2 mouseMovement) = 0;
 };

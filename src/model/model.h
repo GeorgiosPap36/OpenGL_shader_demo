@@ -23,9 +23,9 @@
 unsigned int textureFromFile(const char *path, const std::string &directory);
 
 struct Transform {
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
+    glm::vec3 position = glm::vec3(0, 0, 0);
+    glm::vec3 rotation = glm::vec3(0, 0, 0);
+    glm::vec3 scale = glm::vec3(1, 1, 1);
 };
 
 class Model 
@@ -37,6 +37,7 @@ class Model
     std::string directory;
 
     Model(char const* path);
+    glm::mat4 modelMatrix();
     void draw(Shader &shader);
 
     private:

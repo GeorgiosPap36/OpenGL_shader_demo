@@ -26,8 +26,8 @@ glm::vec2 mouseMovement;
 bool firstMouse = true;
 
 double deltaTime = 0;
-unsigned int frames = 0;
-unsigned int updates = 0;
+uint64_t frames = 0;
+uint64_t updates = 0;
 
 // functions
 int glfwInitialization();
@@ -53,7 +53,7 @@ int main() {
 
     while (!glfwWindowShouldClose(window)) {
         current = glfwGetTime();
-        deltaTime = (double)(current - lastCounter) / glfwGetTime();
+        deltaTime = current - lastCounter;
         lastCounter = current;
         lag += deltaTime;
 
@@ -75,7 +75,6 @@ int main() {
 
 int glfwInitialization() {
 
-    glfwInit();
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
@@ -97,7 +96,7 @@ int glfwInitialization() {
     glfwSetKeyCallback(window, keyCallback);
     glfwSetCursorPosCallback(window, mouseCallback);
 
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -116,7 +115,9 @@ int glfwInitialization() {
 void update(Scene& scene) {
     updates++;
 
-    scene.update(deltaTime, keyboard, mouseMovement);
+    scene.update(SEC_PER_UPDATE, keyboard, mouseMovement);
+
+    mouseMovement = glm::vec2(0.0f);
 }
 
 void render(Scene& scene, float interpolation) {

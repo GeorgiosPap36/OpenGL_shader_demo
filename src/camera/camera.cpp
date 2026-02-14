@@ -17,7 +17,3 @@ Camera::Camera(glm::vec3 up, glm::vec3 forward, glm::vec3 position, float pitch,
 glm::mat4 Camera::viewMatrix() {
     return glm::lookAt(position, position + forward, up);
 }
-
-glm::vec3 Camera::right() {
-    return glm::cross(up, forward);
-}

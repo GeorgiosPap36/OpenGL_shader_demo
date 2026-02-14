@@ -11,6 +11,16 @@ void Model::draw(Shader &shader) {
         meshes[i].draw(shader);
     }
 }
+
+glm::mat4 Model::modelMatrix() {
+    glm::mat4 model = glm::mat4(1.0);
+    model = glm::translate(model, transform.position);
+    model = glm::scale(model, transform.scale);
+    model = glm::rotate(model, transform.rotation.x, glm::vec3(1, 0, 0));
+    model = glm::rotate(model, transform.rotation.y, glm::vec3(0, 1, 0));
+    model = glm::rotate(model, transform.rotation.z, glm::vec3(0, 0, 1));
+    return model;
+}
     
 void Model::loadModel(const std::string &path) {
     Assimp::Importer importer;

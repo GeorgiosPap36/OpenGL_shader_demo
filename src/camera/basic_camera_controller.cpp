@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include "glm/gtx/string_cast.hpp"
+
 #include "camera.h"
 
 class BasicCameraController : public Camera {
@@ -13,60 +15,60 @@ class BasicCameraController : public Camera {
     }
 
     void update(float dt, std::map<int, bool>& keyboard, glm::vec2 mouseMovement) override {
-        glm::vec3 movement;
+        glm::vec3 velocity(0.0);
         // X
         if (keyboard[GLFW_KEY_D]) {
-            movement.x = movementSpeed;
-        } else if (keyboard[GLFW_KEY_A]) {
-            movement.x = -movementSpeed;
+            velocity.x = -movementSpeed;
+        }
+        if (keyboard[GLFW_KEY_A]) {
+            velocity.x = movementSpeed;
         }
         // Y
         if (keyboard[GLFW_KEY_SPACE]) {
-            movement.y = movementSpeed;
-        } else if (keyboard[GLFW_KEY_LEFT_SHIFT]) {
-            movement.y = -movementSpeed;
+            velocity.y = -movementSpeed;
+        }
+        if (keyboard[GLFW_KEY_LEFT_SHIFT]) {
+            velocity.y = movementSpeed;
         }
         // Z
         if (keyboard[GLFW_KEY_W]) {
-            movement.z = -movementSpeed;
-        } else if (keyboard[GLFW_KEY_S]) {
-            movement.z = movementSpeed;
+            velocity.z = movementSpeed;
+        } 
+        if (keyboard[GLFW_KEY_S]) {
+            velocity.z = -movementSpeed;
         }
         
         // Mouse movement
-        applyYawChange(mouseMovement.x * mouseSensitivity);
-        applyPitchChange(mouseMovement.y * mouseSensitivity);
-        updateForwardVector();
+        processMouseMovement(mouseMovement.x, mouseMovement.y);
 
-        position += (forward * movement.z) + (up * movement.y) + (right() * movement.x);
-
-        // std::cout << "Yaw: " << yaw << ", Pitch: " << pitch << std::endl;
-        // std::cout << "Forward: " << forward.to_string() << ", Up: " << up.to_string() << ", Right: " << right().to_string() << std::endl;
+        position += dt * ((forward * velocity.z) + (up * velocity.y) + (right * velocity.x));
+        // std::cout << "Position: " << glm::to_string(position) << ", Velocity: " << glm::to_string(velocity) << ", (yaw, pitch): " << "(" << yaw << ", " << pitch << ")" << std::endl;
     }
 
     private:
-    float mouseSensitivity = 1;
-    float movementSpeed = 1;
+    float mouseSensitivity = 0.5;
+    float movementSpeed = 10;
 
-    void applyYawChange(float val) {
-        yaw += val;
-    }
+    void processMouseMovement(float xoffset, float yoffset) {
+        yaw -= xoffset * mouseSensitivity;
+        pitch -= yoffset * mouseSensitivity;
 
-    void applyPitchChange(float val) {
-        pitch += val;
         pitch = std::clamp(pitch, -89.0f, 89.0f);
+
+        updateCameraVectors();
     }
 
-    void updateForwardVector() {
-        float radPitch = pitch * PI / 180.0;
-        float radYaw = yaw * PI / 180.0;
+    void updateCameraVectors() {
+        glm::vec3 front;
+        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        front.y = sin(glm::radians(pitch));
+        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        forward = glm::normalize(front);
 
-        float cosPitch = cos(radPitch);
-        float sinPitch = sin(radPitch);
-        float cosYaw = cos(radYaw);
-        float sinYaw = sin(radYaw);
+        right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+        up = glm::normalize(glm::cross(right, forward));
 
-        forward = glm::vec3(-sinYaw * cosPitch, sinPitch, -cosPitch * cosYaw);
+        // std::cout << "Up: " << glm::to_string(up) << ", forward: " << glm::to_string(forward) << ", right: " << glm::to_string(right) << std::endl;
     }
 };
 
