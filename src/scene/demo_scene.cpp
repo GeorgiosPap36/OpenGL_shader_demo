@@ -10,24 +10,27 @@
 class DemoScene : public Scene {
 
     private:
+    unsigned int SCR_WIDTH;
+    unsigned int SCR_HEIGHT;
     BasicCameraController camera;
     Shader shader;
-    glm::mat4 projection;
+    glm::mat4 projectionMat;
 
     public:
-    DemoScene() : camera(glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0), 0, -90, 75),
-                  shader("../src/shaders/vertex_shaders/simple_vertex.vs", "../src/shaders/fragment_shaders/simple_fragment.fs") 
+    DemoScene(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) : 
+                SCR_WIDTH(SCR_WIDTH), SCR_HEIGHT(SCR_HEIGHT),
+                camera(glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0), 0, -90, 75),
+                shader("../src/shaders/vertex_shaders/simple_vertex.vs", "../src/shaders/fragment_shaders/simple_fragment.fs") 
     {
         
-        // TODO: Fix projection
-        projection = glm::perspective((float) 75, (float) 1280 / (float) 720, 0.1f, 100.0f);
+        projectionMat = glm::perspective(camera.fovY, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
 
         SceneNode testNode;
 
         std::string path = std::filesystem::path("../assets/models/guitar_backpack/backpack.obj").string();
         testNode.model = std::make_unique<Model>(path.c_str());
         testNode.model->transform.position = glm::vec3(0, 0, -75);
-        testNode.model->transform.scale = glm::vec3(1.0f, -1.0f, 1.0f);
+        testNode.model->transform.scale = glm::vec3(1.0, -1.0, 1.0);
         testNode.model->transform.rotation = glm::vec3(0, 0, 0);
 
         std::cout << glm::to_string(testNode.model->modelMatrix()) << std::endl;
@@ -42,7 +45,7 @@ class DemoScene : public Scene {
 
         shader.use();
         shader.setMat4("view", camera.viewMatrix());
-        shader.setMat4("projection", projection);
+        shader.setMat4("projection", projectionMat);
         shader.setMat4("model", model->modelMatrix());
 
         model->draw(shader);
