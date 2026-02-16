@@ -167,6 +167,7 @@ unsigned int textureFromFile(const char *path, const std::string &directory) {
         } else if (nrComponents == 4) {
             format = GL_RGBA;
         } 
+        stbi_set_flip_vertically_on_load(true);
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);

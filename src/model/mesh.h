@@ -8,6 +8,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
 
 #include "../shaders/shader.h"
 
@@ -20,6 +22,8 @@ struct Vertex {
 
 	int m_BoneIDs[MAX_BONE_INFLUENCE];
 	float m_Weights[MAX_BONE_INFLUENCE];
+
+    void print();
 };
 
 struct Texture {
@@ -38,6 +42,8 @@ class Mesh {
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 
     void draw(Shader &shader);
+    void printVertices(int n = -1);
+    void printIndices(int n = -1);
 
     private:
     unsigned int VBO, EBO;

@@ -3,6 +3,7 @@
 
 #include "scene.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 
 #include "../camera/basic_camera_controller.cpp"
@@ -34,6 +35,12 @@ class DemoScene : public Scene {
         testNode.model->transform.rotation = glm::vec3(0, 0, 0);
 
         std::cout << glm::to_string(testNode.model->modelMatrix()) << std::endl;
+
+        int counter = 0;
+        for (auto mesh : testNode.model->meshes) {
+            std::cout << "Mesh " << counter++ << std::endl;
+            mesh.printVertices(10);
+        }
 
         rootNode.childNodes.emplace("testNode", std::move(testNode));
 

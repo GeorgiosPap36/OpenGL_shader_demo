@@ -1,5 +1,11 @@
 #include "mesh.h"
 
+void Vertex::print() {
+    std::cout << "pos: " << glm::to_string(position) << ", "
+              << "normal: " << glm::to_string(normal) << ", "
+              << "uv: " << glm::to_string(texCoords)  << std::endl;
+}
+
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
     this->vertices = vertices;
     this->indices = indices;
@@ -40,6 +46,26 @@ void Mesh::draw(Shader &shader)  {
     glBindVertexArray(0);
 
     glActiveTexture(GL_TEXTURE0);
+}
+
+
+void Mesh::printVertices(int n) {
+    int vertSize = vertices.size();
+    int size = (n <= 0 && n < vertSize) ? vertSize : n; 
+
+    for (int i = 0; i < size; i++) {
+        Vertex v = vertices[i];
+        v.print();
+    }
+}
+
+void Mesh::printIndices(int n) {
+    int indSize = indices.size();
+    int size = (n <= 0 && n < indSize) ? indSize : n; 
+
+    for (int i = 0; i < size; i+=3) {
+        std::cout << "(" << indices[i] << ", " << indices[i + 1] << ", " << indices[i + 2] << ")" << std::endl;
+    }
 }
 
 void Mesh::setupMesh() {
