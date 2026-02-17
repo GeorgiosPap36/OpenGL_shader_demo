@@ -106,7 +106,7 @@ int glfwInitialization() {
     glEnable(GL_DEPTH_TEST);
 
     // Face culling 
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
