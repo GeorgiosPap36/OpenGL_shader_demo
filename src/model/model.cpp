@@ -1,9 +1,14 @@
 #include "model.h"
 
+
+Model::Model() {
+
+}
+
 Model::Model(char const* path) {
     loadModel(path);
 
-    std::cout << "Loaded " << texturesLoaded.size() << " textures, " << meshes.size() << " meshes from directory: " << directory << std::endl;
+    // std::cout << "Loaded " << texturesLoaded.size() << " textures, " << meshes.size() << " meshes from directory: " << directory << std::endl;
 }
 
 void Model::draw(Shader &shader) {

@@ -44,9 +44,6 @@ int main() {
 
     DemoScene scene(SCR_WIDTH, SCR_HEIGHT);
 
-    std::cout << sizeof(glm::vec3) << std::endl;
-
-
     double displayTimer = 0;
     double lastCounter = glfwGetTime();
     double current;

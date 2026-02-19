@@ -34,13 +34,21 @@ class DemoScene : public Scene {
         testNode.model->transform.scale = glm::vec3(1.0, -1.0, 1.0);
         testNode.model->transform.rotation = glm::vec3(0, 0, 0);
 
-        std::cout << glm::to_string(testNode.model->modelMatrix()) << std::endl;
+        // std::cout << glm::to_string(testNode.model->modelMatrix()) << std::endl;
 
-        int counter = 0;
-        for (auto mesh : testNode.model->meshes) {
-            std::cout << "Mesh " << counter++ << std::endl;
-            mesh.printVertices(10);
-        }
+        // int counter = 0;
+        // for (auto mesh : testNode.model->meshes) {
+        //     std::cout << "Mesh " << counter++ << std::endl;
+        //     mesh.printVertices(10);
+        // }
+
+        // Create material class / struct that binds uniforms and contains shader reference of some sort
+        // Batch objects per material
+        // For each material render the objects
+
+        // Create cube floor
+        // create cube light
+        
 
         rootNode.childNodes.emplace("testNode", std::move(testNode));
 
@@ -50,6 +58,10 @@ class DemoScene : public Scene {
     void render(float interPolation) override  {
         Model* model = rootNode.childNodes["testNode"].model.get();
 
+        // Create material class / struct that binds uniforms and contains shader reference of some sort
+        // Batch objects per material
+        // For each material render the objects
+
         shader.use();
         shader.setMat4("view", camera.viewMatrix());
         shader.setMat4("projection", projectionMat);
@@ -58,7 +70,7 @@ class DemoScene : public Scene {
         model->draw(shader);
     }
 
-    void update(float dt, std::map<int, bool>& keyboard, glm::vec2 mouseMovement) override  {
+    void update(float dt, std::map<int, bool>& keyboard, glm::vec2 mouseMovement) override {
         camera.update(dt, keyboard, mouseMovement);
 
         

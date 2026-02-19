@@ -36,6 +36,7 @@ class Model
     std::vector<Mesh> meshes;
     std::string directory;
 
+    Model();
     Model(char const* path);
     glm::mat4 modelMatrix();
     void draw(Shader &shader);
