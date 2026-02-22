@@ -14,6 +14,7 @@ set(SOURCES
     src/main.cpp
     src/model/mesh.cpp
     src/model/model.cpp
+    src/model/material.cpp
     src/shaders/shader.cpp
     src/shaders/compute_shader.cpp
     src/camera/camera.cpp
