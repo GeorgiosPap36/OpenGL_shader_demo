@@ -16,7 +16,6 @@ class DemoScene : public Scene {
     unsigned int SCR_WIDTH;
     unsigned int SCR_HEIGHT;
     BasicCameraController camera;
-    Shader shader;
     glm::mat4 projectionMat;
 
     std::map<Material*, std::vector<Model*>> renderBatches;
@@ -24,8 +23,7 @@ class DemoScene : public Scene {
     public:
     DemoScene(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) : 
                 SCR_WIDTH(SCR_WIDTH), SCR_HEIGHT(SCR_HEIGHT),
-                camera(glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0), 0, -90, 75),
-                shader("../src/shaders/vertex_shaders/simple_vertex.vs", "../src/shaders/fragment_shaders/simple_fragment.fs") 
+                camera(glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0), 0, -90, 75)
     {
         
         setUpScene();
@@ -41,7 +39,6 @@ class DemoScene : public Scene {
             matShader->use();
 
             matShader->set("view", camera.viewMatrix());
-            matShader->set("projection", projectionMat);
 
             for (const auto& [name, value] : material->uniforms) {
                 std::visit([&](auto&& v) {
@@ -93,8 +90,10 @@ class DemoScene : public Scene {
         auto& testNodeRef = rootNode.childNodes["testNode"];
         auto& cubeNodeRef = rootNode.childNodes["cubeNode"];
 
-        Material* mat1 = new Material(&shader);
-        mat1->bindFloat("asd", 0.5);
+        Shader* shader = new Shader("../src/shaders/vertex_shaders/simple_vertex.vs", "../src/shaders/fragment_shaders/simple_fragment.fs");
+
+        Material* mat1 = new Material(shader);
+        mat1->bindMat4("projection", projectionMat);
 
         renderBatches[mat1].push_back(testNodeRef.model.get());
         renderBatches[mat1].push_back(cubeNodeRef.model.get());
