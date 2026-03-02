@@ -16,6 +16,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
     // std::cout << "Created mesh with " << vertices.size() << " vertices, " << indices.size() << " indices and " << textures.size() << std::endl;
 }
 
+// Move material binding out of here
 void Mesh::draw(Shader &shader)  {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
