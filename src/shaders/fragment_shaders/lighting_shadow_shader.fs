@@ -55,7 +55,6 @@ float directLightShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lig
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
     
-    // Check if coordinates are valid
     if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0) {
         return 0.0;
     }

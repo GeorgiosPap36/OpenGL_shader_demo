@@ -118,11 +118,6 @@ class DemoScene : public Scene {
         SceneNode cubeNode;
         cubeNode.model = std::make_unique<Model>(std::filesystem::path("../assets/models/cube/Cube.obj").string().c_str());
 
-        // Texture tex;
-        // tex.id = textureFromFile("white.png", std::filesystem::path("../assets/textures").string().c_str());
-        // cubeNode.model->texturesLoaded.push_back(tex);
-        // cubeNode.model->meshes.at(0).textures.push_back(tex);
-
         cubeNode.model->transform.position = glm::vec3(0, 5, 0);
         cubeNode.model->transform.scale = glm::vec3(100, -0.05, 100);
         cubeNode.model->transform.rotation = glm::vec3(0, 0, 0);
