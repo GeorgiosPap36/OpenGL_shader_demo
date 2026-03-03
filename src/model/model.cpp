@@ -11,9 +11,9 @@ Model::Model(char const* path) {
     // std::cout << "Loaded " << texturesLoaded.size() << " textures, " << meshes.size() << " meshes from directory: " << directory << std::endl;
 }
 
-void Model::draw(Shader &shader) {
+void Model::draw(Shader &shader, int globalVariableSize) {
     for(unsigned int i = 0; i < meshes.size(); i++) {
-        meshes[i].draw(shader);
+        meshes[i].draw(shader, globalVariableSize);
     }
 }
 

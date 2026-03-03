@@ -12,6 +12,7 @@ class Material {
     using UniformValue = std::variant<
         int,
         float,
+        bool,
         glm::vec3,
         glm::mat4
     >;
@@ -23,8 +24,9 @@ class Material {
 
     void bindInt(const std::string& name, int i);
     void bindFloat(const std::string& name, float f);
-    void bindVec3(const std::string& name,  glm::vec3& vec3);
-    void bindMat4(const std::string& name,  glm::mat4& mat4);
+    void bindBool(const std::string& name, bool b);
+    void bindVec3(const std::string& name, const glm::vec3& vec3);
+    void bindMat4(const std::string& name, const glm::mat4& mat4);
     
 };
 

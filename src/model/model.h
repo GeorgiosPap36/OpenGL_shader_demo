@@ -39,7 +39,7 @@ class Model
     Model();
     Model(char const* path);
     glm::mat4 modelMatrix();
-    void draw(Shader &shader);
+    void draw(Shader &shader, int globalVariableSize = 0);
 
     private:
     void loadModel(const std::string &path);

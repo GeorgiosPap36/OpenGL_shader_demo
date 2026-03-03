@@ -14,27 +14,39 @@ in vec3 normal;
 in vec2 uv;
 in vec3 fragPos;
 
+in vec3 viewPos;
+
 in vec4 fragPosLightSpace;
 
-uniform vec3 viewPos;
 uniform DirLight dirLight;
 
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_ambient1;
-uniform sampler2D texture_specular1;
-uniform sampler2D shadowMap;
+uniform sampler2D texture_diffuse11;
+uniform sampler2D texture_ambient11;
+uniform sampler2D texture_specular11;
+
+uniform bool useTexture;
+
+uniform vec3 color;
+
+layout(location = 5) uniform sampler2D shadowMap;
 
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
+    vec3 ambient, diffuse, specular;
+
     vec3 lightDir = normalize(-light.direction);
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0.1);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1.0);
     
-    vec3 ambient, diffuse, specular;
-
-    ambient = light.ambient * vec3(texture(texture_ambient1, vec2(uv.x , 1 - uv.y)));
-    diffuse = light.diffuse * diff * vec3(texture(texture_diffuse1, vec2(uv.x , 1 - uv.y)));
-    specular = light.specular * spec * vec3(texture(texture_specular1, uv));
+    if (useTexture) {
+        ambient = light.ambient * vec3(texture(texture_ambient11, vec2(uv.x , 1 - uv.y)));
+        diffuse = light.diffuse * diff * vec3(texture(texture_diffuse11, vec2(uv.x , 1 - uv.y)));
+        specular = light.specular * spec * vec3(texture(texture_specular11, uv));
+    } else {
+        ambient = light.ambient * color;
+        diffuse = light.diffuse * diff * color;
+        specular = vec3(0.0);
+    }
     
     return (ambient + diffuse + specular);
 }

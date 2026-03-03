@@ -16,8 +16,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
     // std::cout << "Created mesh with " << vertices.size() << " vertices, " << indices.size() << " indices and " << textures.size() << std::endl;
 }
 
-// Move material binding out of here
-void Mesh::draw(Shader &shader)  {
+void Mesh::draw(Shader &shader, int globalVariableSize)  {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
@@ -25,19 +24,22 @@ void Mesh::draw(Shader &shader)  {
     for(unsigned int i = 0; i < textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
 
-        std::string number;
+        int number = 0;
         std::string texType = textures[i].type;
         if (texType == "texture_diffuse") {
-            number = std::to_string(diffuseNr++);
+            number = diffuseNr++;
         } else if (texType == "texture_specular") {
-            number = std::to_string(specularNr++); 
+            number = specularNr++; 
         } else if (texType == "texture_normal") {
-            number = std::to_string(normalNr++); 
+            number = normalNr++; 
         } else if (texType == "texture_height") {
-            number = std::to_string(heightNr++);
+            number = heightNr++;
         }
+        std::string numberStr = std::to_string(globalVariableSize + number);
 
-        glUniform1i(glGetUniformLocation(shader.ID, (texType + number).c_str()), i);
+        // std::cout << "Texture number: " << texType + numberStr << std::endl;
+
+        glUniform1i(glGetUniformLocation(shader.ID, (texType + numberStr).c_str()), i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
     

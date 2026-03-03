@@ -10,10 +10,6 @@
 
 #include "../camera/basic_camera_controller.cpp"
 
-// Define a number lets say 10 which will be global textures
-// Bind shadowMap in a certain location always (to access shadowMap from shader use (layout = number) uniform sampler2D shadowMap)
-// Bind per frame uniforms in UBO (viewPos, lightSpaceMatrix, ...)
-
 class DemoScene : public Scene {
 
     struct DirectLight {
@@ -23,6 +19,17 @@ class DemoScene : public Scene {
         glm::vec3 specular;
 
         glm::mat4 lightSpaceMatrix;
+    };
+
+    struct FrameUniforms {
+        glm::mat4 projection;
+        glm::mat4 view;
+
+        glm::mat4 lightSpaceMatrix;
+        
+        glm::vec3 cameraPos;
+
+        float _pad;
     };
 
     public:
@@ -41,9 +48,9 @@ class DemoScene : public Scene {
     }
 
     void render(float interPolation) override  {
-        updateUBOs();
-
         generateDepthMap();
+
+        updateUBOs();
  
         glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -51,16 +58,6 @@ class DemoScene : public Scene {
         for (const auto& [material, renderBatch] : renderBatches) {
             Shader* matShader = material->shader;
             matShader->use();
-
-            // Set them once per frame in UBO
-            matShader->set("view", camera.viewMatrix());
-            matShader->set("viewPos", camera.position);
-            matShader->set("lightSpaceMatrix", dirLight.lightSpaceMatrix);
-            
-            // Bind it once per frame
-            glActiveTexture(GL_TEXTURE0 + 5);
-            glBindTexture(GL_TEXTURE_2D, depthMap);
-            matShader->set("shadowMap", 5);
 
             for (const auto& [name, value] : material->uniforms) {
                 std::visit([&](auto&& v) {
@@ -70,7 +67,7 @@ class DemoScene : public Scene {
 
             for (const auto& model : renderBatch) {
                 matShader->set("model", model->modelMatrix());
-                model->draw(*matShader);
+                model->draw(*matShader, GLOBAL_VARIABLE_SIZE);
             }
         }
         
@@ -84,11 +81,16 @@ class DemoScene : public Scene {
     }
 
     private:
+    const int GLOBAL_VARIABLE_SIZE = 10;
+    const int SHADOW_MAP_INDEX = 5;
+
     unsigned int SCR_WIDTH, SCR_HEIGHT;
     BasicCameraController camera;
     std::map<Material*, std::vector<Model*>> renderBatches;
     DirectLight dirLight;
     glm::mat4 projectionMat;
+
+    GLuint frameUBO;
 
     float nearPlane = 0.1, farPlane = 200.0;
     // depthMap
@@ -114,12 +116,12 @@ class DemoScene : public Scene {
         testNode.model->transform.rotation = glm::vec3(0, 0, 0);
 
         SceneNode cubeNode;
-        cubeNode.model = std::make_unique<Model>(std::filesystem::path("../assets/models/cube/cube.obj").string().c_str());
+        cubeNode.model = std::make_unique<Model>(std::filesystem::path("../assets/models/cube/Cube.obj").string().c_str());
 
-        Texture tex;
-        tex.id = textureFromFile("background_ddn.tga", std::filesystem::path("../assets/textures").string().c_str());
-        cubeNode.model->texturesLoaded.push_back(tex);
-        cubeNode.model->meshes.at(0).textures.push_back(tex);
+        // Texture tex;
+        // tex.id = textureFromFile("white.png", std::filesystem::path("../assets/textures").string().c_str());
+        // cubeNode.model->texturesLoaded.push_back(tex);
+        // cubeNode.model->meshes.at(0).textures.push_back(tex);
 
         cubeNode.model->transform.position = glm::vec3(0, 5, 0);
         cubeNode.model->transform.scale = glm::vec3(100, -0.05, 100);
@@ -135,16 +137,30 @@ class DemoScene : public Scene {
 
         Shader* shader = new Shader("../src/shaders/vertex_shaders/lighting_shadow_shader.vs", "../src/shaders/fragment_shaders/lighting_shadow_shader.fs");
 
-        Material* mat1 = new Material(shader);
-        mat1->bindMat4("projection", projectionMat);
+        // Texture Material
+        Material* textureMaterial = new Material(shader);
 
-        mat1->bindVec3("dirLight.direction", dirLight.direction);
-        mat1->bindVec3("dirLight.ambient", dirLight.ambient);
-        mat1->bindVec3("dirLight.diffuse", dirLight.diffuse);
-        mat1->bindVec3("dirLight.specular", dirLight.specular);
+        textureMaterial->bindBool("useTexture", true);
+        textureMaterial->bindVec3("dirLight.direction", dirLight.direction);
+        textureMaterial->bindVec3("dirLight.ambient", dirLight.ambient);
+        textureMaterial->bindVec3("dirLight.diffuse", dirLight.diffuse);
+        textureMaterial->bindVec3("dirLight.specular", dirLight.specular);
+        textureMaterial->bindInt("shadowMap", SHADOW_MAP_INDEX);
 
-        renderBatches[mat1].push_back(testNodeRef.model.get());
-        renderBatches[mat1].push_back(cubeNodeRef.model.get());
+        renderBatches[textureMaterial].push_back(testNodeRef.model.get());
+
+        // Solid color Material
+        Material* solidColorMaterial = new Material(shader);
+
+        solidColorMaterial->bindBool("useTexture", false);
+        solidColorMaterial->bindVec3("dirLight.direction", dirLight.direction);
+        solidColorMaterial->bindVec3("dirLight.ambient", dirLight.ambient);
+        solidColorMaterial->bindVec3("dirLight.diffuse", dirLight.diffuse);
+        solidColorMaterial->bindVec3("dirLight.specular", dirLight.specular);
+        solidColorMaterial->bindVec3("color", glm::vec3(1.0));
+        solidColorMaterial->bindInt("shadowMap", SHADOW_MAP_INDEX);
+
+        renderBatches[solidColorMaterial].push_back(cubeNodeRef.model.get());
     }
 
     void setUpFBOs() {
@@ -210,6 +226,9 @@ class DemoScene : public Scene {
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_INDEX);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
     }
 
     void renderQuad(Shader& shader, unsigned int renderTexture) {
@@ -243,11 +262,25 @@ class DemoScene : public Scene {
     }
 
     void setUpUBOs() {
+        glGenBuffers(1, &frameUBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, frameUBO);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(FrameUniforms), nullptr, GL_DYNAMIC_DRAW);
 
+        glBindBufferBase(GL_UNIFORM_BUFFER, 3, frameUBO);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
     void updateUBOs() {
+        FrameUniforms data;
+        data.projection = projectionMat;
+        data.view = camera.viewMatrix();
+        data.lightSpaceMatrix = dirLight.lightSpaceMatrix;
+        data.cameraPos = camera.position;
 
+        glBindBuffer(GL_UNIFORM_BUFFER, frameUBO);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(FrameUniforms), &data);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
 };
