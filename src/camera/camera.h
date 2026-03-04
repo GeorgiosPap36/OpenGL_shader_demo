@@ -13,7 +13,7 @@
 
 class Camera {
     public:
-    glm::vec3 up, forward, right, position;
+    glm::vec3 up, worldUp, forward, right, position;
     float pitch, yaw, fovY;
 
     virtual ~Camera() = default;

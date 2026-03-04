@@ -13,23 +13,25 @@ class BasicCameraController : public Camera {
     BasicCameraController(glm::vec3 up, glm::vec3 forward, glm::vec3 position, float pitch, float yaw, float fovY) 
         : Camera(up, forward, position, pitch, yaw, fovY) {
 
+            worldUp = glm::vec3(0, 1, 0);
+            updateCameraVectors();
     }
 
     void update(float dt, std::map<int, bool>& keyboard, glm::vec2 mouseMovement) override {
         glm::vec3 velocity(0.0);
         // X
         if (keyboard[GLFW_KEY_D]) {
-            velocity.x = -movementSpeed;
+            velocity.x = movementSpeed;
         }
         if (keyboard[GLFW_KEY_A]) {
-            velocity.x = movementSpeed;
+            velocity.x = -movementSpeed;
         }
         // Y
         if (keyboard[GLFW_KEY_SPACE]) {
-            velocity.y = -movementSpeed;
+            velocity.y = movementSpeed;
         }
         if (keyboard[GLFW_KEY_LEFT_SHIFT]) {
-            velocity.y = movementSpeed;
+            velocity.y = -movementSpeed;
         }
         // Z
         if (keyboard[GLFW_KEY_W]) {
@@ -51,8 +53,12 @@ class BasicCameraController : public Camera {
     float movementSpeed = 10;
 
     void processMouseMovement(float xoffset, float yoffset) {
-        yaw -= xoffset * mouseSensitivity;
-        pitch -= yoffset * mouseSensitivity;
+        if (xoffset == 0 && yoffset == 0) {
+            return;
+        }
+
+        yaw += xoffset * mouseSensitivity;
+        pitch += yoffset * mouseSensitivity;
 
         pitch = std::clamp(pitch, -89.0f, 89.0f);
 

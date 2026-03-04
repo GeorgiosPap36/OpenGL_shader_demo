@@ -101,9 +101,9 @@ class DemoScene : public Scene {
     unsigned int renderFBO, renderDepthRBO, renderTexture;
 
     void setUpScene() {
-        projectionMat = glm::perspective(camera.fovY, (float) SCR_WIDTH / (float) SCR_HEIGHT, nearPlane, farPlane);
+        projectionMat = glm::perspective(glm::radians(camera.fovY), (float) SCR_WIDTH / (float) SCR_HEIGHT, nearPlane, farPlane);
 
-        dirLight.direction = glm::vec3(0.0, 0.25, -0.75);
+        dirLight.direction = glm::vec3(0.0, -0.25, -0.75);
         dirLight.ambient = glm::vec3(0.05f); 
         dirLight.diffuse = glm::vec3(0.4f); 
         dirLight.specular = glm::vec3(0.5f);
@@ -111,15 +111,15 @@ class DemoScene : public Scene {
         SceneNode testNode;
 
         testNode.model = std::make_unique<Model>(std::filesystem::path("../assets/models/guitar_backpack/backpack.obj").string().c_str());
-        testNode.model->transform.position = glm::vec3(0, 2, 0);
-        testNode.model->transform.scale = glm::vec3(1.0, -1.0, 1.0);
+        testNode.model->transform.position = glm::vec3(0, 0, 0);
+        testNode.model->transform.scale = glm::vec3(1.0, 1.0, 1.0);
         testNode.model->transform.rotation = glm::vec3(0, 0, 0);
 
         SceneNode cubeNode;
         cubeNode.model = std::make_unique<Model>(std::filesystem::path("../assets/models/cube/Cube.obj").string().c_str());
 
-        cubeNode.model->transform.position = glm::vec3(0, 5, 0);
-        cubeNode.model->transform.scale = glm::vec3(100, -0.05, 100);
+        cubeNode.model->transform.position = glm::vec3(0, -7, 0);
+        cubeNode.model->transform.scale = glm::vec3(100, 0.05, 100);
         cubeNode.model->transform.rotation = glm::vec3(0, 0, 0);
 
         rootNode.childNodes.emplace("testNode", std::move(testNode));
