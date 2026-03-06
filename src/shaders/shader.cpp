@@ -53,8 +53,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
     checkCompileErrors(fragment, "FRAGMENT");
     // if geometry shader is given, compile geometry shader
     unsigned int geometry;
-    if (geometryPath != nullptr)
-    {
+    if (geometryPath != nullptr) {
         const char* gShaderCode = geometryCode.c_str();
         geometry = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(geometry, 1, &gShaderCode, NULL);
@@ -73,8 +72,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
     
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-    if (geometryPath != nullptr)
+    if (geometryPath != nullptr) {
         glDeleteShader(geometry);
+    }
 }
 
 void Shader::use() {
@@ -132,20 +132,16 @@ void Shader::set(const std::string& name, const glm::mat4& mat) const {
 void Shader::checkCompileErrors(GLuint shader, std::string type) {
     GLint success;
     GLchar infoLog[1024];
-    if (type != "PROGRAM")
-    {
+    if (type != "PROGRAM") {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
+        if (!success) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
             std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
-    else
-    {
+    else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success)
-        {
+        if (!success) {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
             std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
